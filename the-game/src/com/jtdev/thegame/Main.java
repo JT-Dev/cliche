@@ -10,7 +10,7 @@ import org.newdawn.slick.SlickException;
 public class Main extends BasicGame
 {
     private Input input;
-    private Player player;
+    private World world;
     
     public Main()
     {
@@ -21,18 +21,18 @@ public class Main extends BasicGame
     public void init(GameContainer gc) throws SlickException
     {
 	input = gc.getInput();
-	player = new Player();
+	world = new World();
     }
 
     @Override
     public void update(GameContainer gc, int delta) throws SlickException
     {
-	player.update(gc, delta, input);
+	world.update(gc, delta, input);
     }
 
     public void render(GameContainer gc, Graphics g) throws SlickException
     {
-	player.draw();
+	world.draw(gc, g);
     }
     
     public static void main(String[] args) throws SlickException
