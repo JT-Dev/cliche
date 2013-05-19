@@ -38,8 +38,9 @@ public class Main extends BasicGame
     public static void main(String[] args) throws SlickException
     {
 	AppGameContainer app = new AppGameContainer(new Main());
-	app.setTargetFrameRate(120);
-	app.setVSync(true);
+	app.setTargetFrameRate(60);
+	app.setVSync(false);
+	app.setSmoothDeltas(true);
 	app.setDisplayMode(800, 600, false);
 	app.start();
     }
