@@ -18,10 +18,10 @@ public class Player extends Image
 	in_air = true;
     }
 
-    public void update(GameContainer gc, int delta, Input input)
+    public void update(World world, int delta, Input input)
     {
 	/* Input Detection */
-	in_air = y < (gc.getHeight() - height);
+	in_air = y < (world.getHeight() - height);
 	if((input.isKeyDown(Input.KEY_W) || input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_SPACE)) && !in_air)
 	    y_vel -= Constants.PLAYER_YSPEED;
 	//if(input.isKeyDown(Input.KEY_S) || input.isKeyDown(Input.KEY_DOWN)) y_vel += d; /* Who the F**K has ever wanted a down key? */
@@ -39,22 +39,24 @@ public class Player extends Image
 	x += x_vel * delta;
 	
 	/* Collision Detection */
-	if(y < 0 || y > (gc.getHeight() - height)) {
+	if(y < 0 || y > (world.getHeight() - height)) {
 	    in_air = false;
-	    y = y > 0 ? gc.getHeight() - height : 0;
+	    y = y > 0 ? world.getHeight() - height : 0;
 	    y_vel = 0;
 	}
 	
-	if(x < 0 || x > (gc.getWidth() - width)) {
-	    x = x > 0 ? gc.getWidth() - width : 0;
+	if(x < 0 || x > (world.getWidth() - width)) {
+	    x = x > 0 ? world.getWidth() - width : 0;
 	    x_vel = 0;
 	}
     }
     
-    @Override
-    public void draw()
+    public void render(Camera camera, GameContainer gc)
     {
-        super.draw((float) x, (float) y);
+	float xd = (float) ((x - camera.getX()) * gc.getWidth() / camera.getWidth());
+	float yd = (float) ((y - camera.getY()) * gc.getHeight() / camera.getHeight());
+	
+        draw(xd, yd);
     }
     
     public double getX()
