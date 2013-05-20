@@ -2,14 +2,11 @@
 
 PROJECT="`pwd`"
 FINAL="thegame"
-PLATFORM="linux"
 
 LIBDIR="$PROJECT/lib"
 LIBS=("jinput.jar" "lwjgl.jar" "slick.jar")
 
-NATIVEDIR="$LIBDIR/native/$PLATFORM"
-#NATIVEDIR="$LIBDIR/native"
-NATIVES=("libjinput-linux64.so" "libjinput-linux.so" "liblwjgl64.so" "liblwjgl.so" "libopenal64.so" "libopenal.so")
+NATIVEDIR="$LIBDIR/native"
 
 BINDIR="$PROJECT/bin"
 BIN="com"
@@ -24,13 +21,7 @@ INIT="RunJar"
 TMPINIT="$INIT.java"
 MAIN="com.jtdev.thegame.Main"
 
-PATHS=""
-for i in "${NATIVES[@]}"; do
-	PATHS=$PATHS" System.load(System.getProperty(\"java.class.path\") + \"!\" + File.separator + \"`echo "$i" | sed "s/[/]?\(.*\)lib\(.*\).so/\\1\\2/g"`\");"
-done
-
 INITJAR=(
-"//package $INIT;"
 "import com.jdotsoft.jarloader.JarClassLoader;"
 "public class $INIT {"
 "	public static void main(String[] args) {"
@@ -44,8 +35,6 @@ INITJAR=(
 "}"
 )
 
-echo "${NATIVES[@]}"
-
 cd $PROJECT
 ant clean build
 jar cf "$TMPJAR" -C "$BINDIR" "$BIN" -C "$RESDIR" "$RES"
@@ -57,11 +46,7 @@ for i in "${LIBS[@]}"; do
 	   jar xf "$LIBDIR/$i"
 done
 
-for i in "${NATIVES[@]}"; do
-	cp "$NATIVEDIR/$i" "$TMPDIR"
-done
-
-#cp -r "$NATIVEDIR" "$TMPDIR"
+cp -r "$NATIVEDIR" "$TMPDIR"
 
 cd "$PROJECT"
 rm -f "$TMPINIT"
@@ -72,9 +57,8 @@ done
 javac -cp "$TMPDIR" "$TMPINIT" -d "$TMPDIR"
 
 cd "$TMPDIR"
-#jar cfe "$PROJECT/game.jar" "$MAIN" `ls --color=auto "$TMPDIR"`
-jar cfe "$PROJECT/$FINAL-$PLATFORM.jar" "$INIT" `ls --color=auto "$TMPDIR"`
-chmod +x "$PROJECT/$FINAL-$PLATFORM.jar"
+jar cfe "$PROJECT/$FINAL.jar" "$INIT" `ls --color=auto "$TMPDIR"`
+chmod +x "$PROJECT/$FINAL.jar"
 
 cd "$PROJECT"
 rm -rf "$TMPJAR" "$TMPDIR" "$TMPMANI" "$TMPINIT"
