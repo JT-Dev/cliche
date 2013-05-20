@@ -53,9 +53,8 @@ public class Player extends Image
     
     public void render(Camera camera, GameContainer gc)
     {
-	float xd = (float) ((x - camera.getX()) * gc.getWidth() / camera.getWidth());
-	float yd = (float) ((y - camera.getY()) * gc.getHeight() / camera.getHeight());
-	
+	float xd = (float) camera.toCameraX(x, gc);
+	float yd = (float) camera.toCameraY(y, gc);
         draw(xd, yd);
     }
     

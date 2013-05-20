@@ -1,5 +1,7 @@
 package com.jtdev.thegame;
 
+import org.newdawn.slick.GameContainer;
+
 public class Camera
 {
     private double x, y;
@@ -65,5 +67,15 @@ public class Camera
     public double getY()
     {
 	return y;
+    }
+
+    public double toCameraX(double x, GameContainer gc)
+    {
+	return ((x - this.x) * gc.getWidth() / this.width);
+    }
+
+    public double toCameraY(double y, GameContainer gc)
+    {
+	return ((y - this.y) * gc.getHeight() / this.height);
     }
 }

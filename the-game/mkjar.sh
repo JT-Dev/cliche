@@ -1,13 +1,14 @@
 #!/bin/bash
 
 PROJECT="`pwd`"
+FINAL="thegame"
 PLATFORM="linux"
 
 LIBDIR="$PROJECT/lib"
 LIBS=("jinput.jar" "lwjgl.jar" "slick.jar")
 
-#NATIVEDIR="$LIBDIR/native/$PLATFORM"
-NATIVEDIR="$LIBDIR/native"
+NATIVEDIR="$LIBDIR/native/$PLATFORM"
+#NATIVEDIR="$LIBDIR/native"
 NATIVES=("libjinput-linux64.so" "libjinput-linux.so" "liblwjgl64.so" "liblwjgl.so" "libopenal64.so" "libopenal.so")
 
 BINDIR="$PROJECT/bin"
@@ -56,11 +57,11 @@ for i in "${LIBS[@]}"; do
 	   jar xf "$LIBDIR/$i"
 done
 
-#for i in "${NATIVES[@]}"; do
-#	cp "$NATIVEDIR/$i" "$TMPDIR"
-#done
+for i in "${NATIVES[@]}"; do
+	cp "$NATIVEDIR/$i" "$TMPDIR"
+done
 
-cp -r "$NATIVEDIR" "$TMPDIR"
+#cp -r "$NATIVEDIR" "$TMPDIR"
 
 cd "$PROJECT"
 rm -f "$TMPINIT"
@@ -72,7 +73,8 @@ javac -cp "$TMPDIR" "$TMPINIT" -d "$TMPDIR"
 
 cd "$TMPDIR"
 #jar cfe "$PROJECT/game.jar" "$MAIN" `ls --color=auto "$TMPDIR"`
-jar cfe "$PROJECT/game.jar" "$INIT" `ls --color=auto "$TMPDIR"`
+jar cfe "$PROJECT/$FINAL-$PLATFORM.jar" "$INIT" `ls --color=auto "$TMPDIR"`
+chmod +x "$PROJECT/$FINAL-$PLATFORM.jar"
 
 cd "$PROJECT"
 rm -rf "$TMPJAR" "$TMPDIR" "$TMPMANI" "$TMPINIT"
