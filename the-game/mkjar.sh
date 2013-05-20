@@ -6,7 +6,8 @@ PLATFORM="linux"
 LIBDIR="$PROJECT/lib"
 LIBS=("jinput.jar" "lwjgl.jar" "slick.jar")
 
-NATIVEDIR="$LIBDIR/native/$PLATFORM"
+#NATIVEDIR="$LIBDIR/native/$PLATFORM"
+NATIVEDIR="$LIBDIR/native"
 NATIVES=("libjinput-linux64.so" "libjinput-linux.so" "liblwjgl64.so" "liblwjgl.so" "libopenal64.so" "libopenal.so")
 
 BINDIR="$PROJECT/bin"
@@ -18,25 +19,29 @@ RES="res"
 TMPJAR="`mktemp $PROJECT/main-XXXXXXXXXX.jar`"
 TMPDIR="`mktemp -d $PROJECT/jar-XXXXXXXXXX`"
 
-#INIT="RunJar"
-#TMPINIT="$INIT.java"
-#MAIN="com.jtdev.thegame.Main"
-#INITJAR=(
-#"//package RunJar;"
-#"import $MAIN;"
-#"import org.newdawn.slick.SlickException;"
-#"public class RunJar {"
-#"	public RunJar() {"
-#"	}"
-#"	public static void main(String[] args) throws SlickException {"
-#"		String newpath = \"lib/native/$PLATFORM\";"
-#"		System.setProperty(\"java.library.path\", newpath);"
-#"		Main main = new Main();"
-#"		main.main(args);"
-#"	}"
-#"}")
-
+INIT="RunJar"
+TMPINIT="$INIT.java"
 MAIN="com.jtdev.thegame.Main"
+
+PATHS=""
+for i in "${NATIVES[@]}"; do
+	PATHS=$PATHS" System.load(System.getProperty(\"java.class.path\") + \"!\" + File.separator + \"`echo "$i" | sed "s/[/]?\(.*\)lib\(.*\).so/\\1\\2/g"`\");"
+done
+
+INITJAR=(
+"//package $INIT;"
+"import com.jdotsoft.jarloader.JarClassLoader;"
+"public class $INIT {"
+"	public static void main(String[] args) {"
+"		JarClassLoader jcl = new JarClassLoader();"
+"		try {"
+"			jcl.invokeMain(\"$MAIN\", args);"
+"		} catch (Throwable e) {"
+"			e.printStackTrace();"
+"		}"
+"	}"
+"}"
+)
 
 echo "${NATIVES[@]}"
 
@@ -51,19 +56,23 @@ for i in "${LIBS[@]}"; do
 	   jar xf "$LIBDIR/$i"
 done
 
-for i in "${NATIVES[@]}"; do
-	cp "$NATIVEDIR/$i" "$TMPDIR"
-done
-
-#cd "$PROJECT"
-#rm -f "$TMPINIT"
-#touch "$TMPINIT"
-#for i in "${INITJAR[@]}"; do
-	#echo "$i" >> "$TMPINIT"
+#for i in "${NATIVES[@]}"; do
+#	cp "$NATIVEDIR/$i" "$TMPDIR"
 #done
-#javac -cp "$TMPDIR" "$TMPINIT" -d "$TMPDIR"
 
-jar cfe "$PROJECT/game.jar" "$MAIN" `ls --color=auto "$TMPDIR"`
+cp -r "$NATIVEDIR" "$TMPDIR"
+
+cd "$PROJECT"
+rm -f "$TMPINIT"
+touch "$TMPINIT"
+for i in "${INITJAR[@]}"; do
+	echo "$i" >> "$TMPINIT"
+done
+javac -cp "$TMPDIR" "$TMPINIT" -d "$TMPDIR"
+
+cd "$TMPDIR"
+#jar cfe "$PROJECT/game.jar" "$MAIN" `ls --color=auto "$TMPDIR"`
+jar cfe "$PROJECT/game.jar" "$INIT" `ls --color=auto "$TMPDIR"`
 
 cd "$PROJECT"
 rm -rf "$TMPJAR" "$TMPDIR" "$TMPMANI" "$TMPINIT"
